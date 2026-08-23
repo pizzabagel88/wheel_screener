@@ -103,8 +103,8 @@ dependencies {
     // Date/Time
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
     
-    // Charts (lightweight Compose-compatible)
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    // Charts (Compose-compatible) - using simple custom charts for now
+    // Can be replaced with external library like "com.github.tehras:charts" if needed
     
     // WorkManager
     implementation("androidx.work:work-runtime-ktx:2.9.0")
