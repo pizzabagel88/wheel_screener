@@ -2,10 +2,13 @@ package com.wheelscreener.data.remote
 
 import com.wheelscreener.domain.model.*
 import kotlinx.datetime.Clock
-import kotlinx.datetime.DateTimePeriod
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.Instant
+import kotlinx.datetime.Month
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
 import kotlin.random.Random
 
 /**
@@ -21,6 +24,7 @@ class MockMarketDataProvider : MarketDataProvider {
     )
     
     private val symbolData = mutableMapOf<String, SymbolInfo>()
+    private val nyTimeZone = TimeZone.of("America/New_York")
     
     init {
         initializeSymbolData()
@@ -96,7 +100,7 @@ class MockMarketDataProvider : MarketDataProvider {
                 freeCashFlowTTM = info.marketCap * 0.1 * (0.8 + random.nextDouble() * 0.4),
                 netDebt = info.marketCap * 0.2 * (0.0 + random.nextDouble() * 0.5),
                 sector = info.sector,
-                nextEarningsDate = now.plus(DateTimePeriod(days = 15 + random.nextInt(30))),
+                nextEarningsDate = now.plus(15 + random.nextInt(30), DateTimeUnit.DAY, nyTimeZone),
                 nextEarningsTime = if (random.nextBoolean()) "AMC" else "BMO",
                 isStale = false,
                 confidence = DataConfidence.HIGH
@@ -115,10 +119,7 @@ class MockMarketDataProvider : MarketDataProvider {
         return try {
             val info = symbolData[symbol] ?: generateSymbolInfo(symbol)
             val bars = mutableListOf<HistoricalBar>()
-            
             var currentDate = startDate
-            val dayMillis = 24 * 60 * 60 * 1000L
-            
             while (currentDate <= endDate) {
                 val basePrice = info.basePrice * (0.9 + random.nextDouble() * 0.2)
                 bars.add(
@@ -131,7 +132,7 @@ class MockMarketDataProvider : MarketDataProvider {
                         volume = (5_000_000 + random.nextDouble() * 20_000_000).toLong()
                     )
                 )
-                currentDate = currentDate.plus(dayMillis)
+                currentDate = currentDate.plus(1, DateTimeUnit.DAY, nyTimeZone)
             }
             
             Result.success(bars)
@@ -189,7 +190,7 @@ class MockMarketDataProvider : MarketDataProvider {
             listOf(specificExpiration)
         } else {
             (0..3).map { i ->
-                now.plus(DateTimePeriod(days = 7 * (i + 1)))
+                now.plus(7 * (i + 1), DateTimeUnit.DAY, nyTimeZone)
             }
         }
         
@@ -202,9 +203,7 @@ class MockMarketDataProvider : MarketDataProvider {
         }
         
         val atmStrike = (underlyingPrice / strikeStep).toInt() * strikeStep
-        val strikes = ((atmStrike - 5 * strikeStep).toInt()..(atmStrike + 5 * strikeStep).toInt())
-            .map { it.toDouble() * strikeStep }
-            .filter { it > 0 }
+        val strikes = (-5..5).map { atmStrike + it * strikeStep }.filter { it > 0 }
         
         expirations.forEach { expiration ->
             val dte = ((expiration - now).inWholeDays).toInt()
@@ -283,7 +282,7 @@ class MockMarketDataProvider : MarketDataProvider {
                 CorporateEvent(
                     symbol = symbol,
                     eventType = EventType.EARNINGS,
-                    eventDate = now.plus(DateTimePeriod(days = 15 + random.nextInt(30))),
+                    eventDate = now.plus(15 + random.nextInt(30), DateTimeUnit.DAY, nyTimeZone),
                     eventTime = if (random.nextBoolean()) "AMC" else "BMO",
                     description = "Quarterly Earnings Release"
                 )
@@ -295,7 +294,7 @@ class MockMarketDataProvider : MarketDataProvider {
                     CorporateEvent(
                         symbol = symbol,
                         eventType = EventType.DIVIDEND,
-                        eventDate = now.plus(DateTimePeriod(days = 30 + random.nextInt(60))),
+                        eventDate = now.plus(30 + random.nextInt(60), DateTimeUnit.DAY, nyTimeZone),
                         description = "Quarterly Dividend"
                     )
                 )
@@ -314,33 +313,27 @@ class MockMarketDataProvider : MarketDataProvider {
         return try {
             val tradingDays = mutableListOf<Instant>()
             val holidays = mutableListOf<MarketHoliday>()
-            
             var currentDate = startDate
-            val dayMillis = 24 * 60 * 60 * 1000L
-            val nyTimeZone = TimeZone.of("America/New_York")
-            
             while (currentDate <= endDate) {
                 val dayOfWeek = currentDate.toLocalDateTime(nyTimeZone).dayOfWeek
                 
-                // Skip weekends
-                if (dayOfWeek.name in listOf("SATURDAY", "SUNDAY")) {
-                    currentDate = currentDate.plus(dayMillis)
+                if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
+                    currentDate = currentDate.plus(1, DateTimeUnit.DAY, nyTimeZone)
                     continue
                 }
                 
-                // Add some holidays
-                val month = currentDate.toLocalDateTime(nyTimeZone).monthNumber
+                val month = currentDate.toLocalDateTime(nyTimeZone).month
                 val day = currentDate.toLocalDateTime(nyTimeZone).dayOfMonth
                 
-                if ((month == 1 && day == 1) || // New Year
-                    (month == 7 && day == 4) || // Independence Day
-                    (month == 12 && day == 25)) { // Christmas
+                if ((month == Month.JANUARY && day == 1) ||
+                    (month == Month.JULY && day == 4) ||
+                    (month == Month.DECEMBER && day == 25)) {
                     holidays.add(
                         MarketHoliday(
                             date = currentDate,
                             name = when {
-                                month == 1 && day == 1 -> "New Year's Day"
-                                month == 7 && day == 4 -> "Independence Day"
+                                month == Month.JANUARY && day == 1 -> "New Year's Day"
+                                month == Month.JULY && day == 4 -> "Independence Day"
                                 else -> "Christmas Day"
                             },
                             isMarketOpen = false
@@ -350,7 +343,7 @@ class MockMarketDataProvider : MarketDataProvider {
                     tradingDays.add(currentDate)
                 }
                 
-                currentDate = currentDate.plus(dayMillis)
+                currentDate = currentDate.plus(1, DateTimeUnit.DAY, nyTimeZone)
             }
             
             Result.success(MarketCalendar(tradingDays, holidays))

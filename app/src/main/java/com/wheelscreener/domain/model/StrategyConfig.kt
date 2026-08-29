@@ -29,7 +29,7 @@ data class StrategyConfig(
     // Liquidity configuration
     val minOpenInterest: Int = 500,
     val minContractVolume: Int = 100,
-    val maxSpreadPercent: Double = 0.05, // 5%
+    val maxSpreadPercent: Double = 5.0, // percent
     val maxSpreadAbsolute: Double = 0.10, // $0.10
     val minAverageDollarVolume: Long = 500_000_000L, // $500M/day
     val requireWeeklyExpiration: Boolean = true,
@@ -42,15 +42,15 @@ data class StrategyConfig(
     val allowHighIvRankWithoutEvent: Boolean = true,
     
     // Pullback configuration
-    val pullbackMin20d: Double = 0.05, // 5%
-    val pullbackMax20d: Double = 0.15, // 15%
-    val pullbackMin60d: Double = 0.08, // 8%
-    val pullbackMax60d: Double = 0.20, // 20%
-    val maxDecline20d: Double = 0.20, // 20% - breakdown threshold
+    val pullbackMin20d: Double = 5.0,
+    val pullbackMax20d: Double = 15.0,
+    val pullbackMin60d: Double = 8.0,
+    val pullbackMax60d: Double = 20.0,
+    val maxDecline20d: Double = 20.0,
     
     // Trend configuration
     val preferAbove200Sma: Boolean = true,
-    val allowBelow200SmaTolerance: Double = 0.05, // 5%
+    val allowBelow200SmaTolerance: Double = 5.0, // percent
     val requireImprovingRelativeStrength: Boolean = false,
     
     // Score weights
@@ -59,7 +59,17 @@ data class StrategyConfig(
     val pullbackWeight: Double = 20.0,
     val fundamentalWeight: Double = 15.0,
     val technicalWeight: Double = 10.0,
-    val diversificationWeight: Double = 10.0
+    val diversificationWeight: Double = 10.0,
+    
+    // Scheduling configuration
+    val scanEnabled: Boolean = true,
+    val scanHourOfDay: Int = 9,
+    val scanMinute: Int = 30,
+    val scanTimeZone: String = "America/New_York",
+    val scanWeekdaysOnly: Boolean = true,
+    val notifyOnScanComplete: Boolean = true,
+    val notifyOnHighQualityCandidates: Boolean = true,
+    val minScoreForNotification: Double = 60.0
 ) {
     companion object {
         fun default() = StrategyConfig()

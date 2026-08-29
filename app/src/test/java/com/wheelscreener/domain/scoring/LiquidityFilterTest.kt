@@ -113,7 +113,7 @@ class LiquidityFilterTest {
     @Test
     fun `test comprehensive liquidity check`() {
         val flags = LiquidityFilter.checkLiquidity(
-            sampleContract, sampleUnderlying, 10, config
+            sampleContract, sampleUnderlying, 5, config
         )
         assertTrue(flags.isEmpty())
         

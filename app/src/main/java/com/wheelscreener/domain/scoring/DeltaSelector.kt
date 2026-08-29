@@ -137,7 +137,7 @@ object DeltaSelector {
         val distanceFromTarget = kotlin.math.abs(absoluteDelta - targetDelta)
         val rangeWidth = maxDelta - minDelta
         
-        return 1.0 - (distanceFromTarget / (rangeWidth / 2.0))
+        return (1.0 - (distanceFromTarget / (rangeWidth / 2.0))).coerceAtLeast(0.1)
     }
     
     /**
@@ -149,15 +149,14 @@ object DeltaSelector {
         ivRank: Double?,
         config: StrategyConfig
     ): Boolean {
+        // High-IV symbols are satellite regardless of size.
+        if (ivRank != null && ivRank > 50) return false
+
         // Above preferred market cap = core
         if (marketCap >= config.marketCapPreferred) return true
         
         // Below minimum = satellite
         if (marketCap < config.marketCapMin) return false
-        
-        // In between - check IV
-        // High IV symbols treated as satellite for risk management
-        if (ivRank != null && ivRank > 50) return false
         
         return true
     }

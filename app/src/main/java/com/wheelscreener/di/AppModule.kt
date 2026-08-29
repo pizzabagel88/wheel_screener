@@ -7,9 +7,11 @@ import com.wheelscreener.data.local.dao.ScanResultDao
 import com.wheelscreener.data.local.dao.SettingsDao
 import com.wheelscreener.data.local.dao.WatchlistDao
 import com.wheelscreener.data.remote.MarketDataProvider
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.wheelscreener.data.remote.MockMarketDataProvider
-import com.wheelscreener.data.repository.MarketDataRepository
 import com.wheelscreener.data.repository.MarketDataRepositoryImpl
+import com.wheelscreener.domain.repository.MarketDataRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -60,7 +62,13 @@ object AppModule {
     @Singleton
     fun provideMarketDataRepository(
         marketDataProvider: MarketDataProvider
-    ): MarketDataRepository {
+    ): com.wheelscreener.domain.repository.MarketDataRepository {
         return MarketDataRepositoryImpl(marketDataProvider)
+    }
+    
+    @Provides
+    @Singleton
+    fun provideMoshi(): Moshi {
+        return Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
     }
 }

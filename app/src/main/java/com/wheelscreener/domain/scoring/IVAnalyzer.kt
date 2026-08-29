@@ -17,7 +17,7 @@ object IVAnalyzer {
         config: com.wheelscreener.domain.model.StrategyConfig
     ): Boolean {
         if (ivRank == null) return false
-        return ivRank in config.ivRankMin..config.ivRankMax
+        return ivRank >= config.ivRankMin && ivRank <= config.ivRankMax
     }
     
     /**
@@ -28,7 +28,7 @@ object IVAnalyzer {
         config: com.wheelscreener.domain.model.StrategyConfig
     ): Boolean {
         if (ivRank == null) return false
-        return ivRank in config.ivRankTarget..config.ivRankTargetMax
+        return ivRank >= config.ivRankTarget && ivRank <= config.ivRankTargetMax
     }
     
     /**
@@ -106,10 +106,7 @@ object IVAnalyzer {
         }
         
         if (isHighIVRank(contract.ivRank)) {
-            // Only flag as high IV if there's event risk
-            if (hasEventRisk || !config.allowHighIvRankWithoutEvent) {
-                flags.add(CandidateFlag.HIGH_IV_RANK)
-            }
+            flags.add(CandidateFlag.HIGH_IV_RANK)
         }
         
         return flags

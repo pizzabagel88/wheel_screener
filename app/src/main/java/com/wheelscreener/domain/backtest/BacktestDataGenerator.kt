@@ -4,7 +4,12 @@ import com.wheelscreener.data.remote.HistoricalBar
 import com.wheelscreener.domain.model.OptionContract
 import com.wheelscreener.domain.model.Underlying
 import com.wheelscreener.domain.scoring.DteSelector
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
+import kotlinx.datetime.minus
 import kotlin.random.Random
 
 /**
@@ -53,7 +58,7 @@ object BacktestDataGenerator {
                 )
             )
             
-            currentDate = currentDate.plus(kotlinx.datetime.DateTimePeriod(days = 1))
+            currentDate = currentDate.plus(1, DateTimeUnit.DAY, TimeZone.UTC)
         }
         
         return bars
@@ -81,9 +86,8 @@ object BacktestDataGenerator {
         }
         
         val atmStrike = (underlyingPrice / strikeStep).toInt() * strikeStep
-        val strikes = ((atmStrike - strikeCount * strikeStep / 2).toInt()..(atmStrike + strikeCount * strikeStep / 2).toInt())
-            .map { it.toDouble() * strikeStep }
-            .filter { it > 0 }
+        val halfCount = strikeCount / 2
+        val strikes = ((-halfCount)..halfCount).map { atmStrike + it * strikeStep }.filter { it > 0 }
         
         val dte = DteSelector.calculateDTE(now, expiration)
         
@@ -158,8 +162,8 @@ object BacktestDataGenerator {
         basePrice: Double = 100.0,
         scenarioType: ScenarioType = ScenarioType.NORMAL
     ): BacktestScenario {
-        val now = kotlinx.datetime.Clock.System.now()
-        val startDate = now.minus(kotlinx.datetime.DateTimePeriod(days = days))
+        val now = Clock.System.now()
+        val startDate = now.minus(days, DateTimeUnit.DAY, TimeZone.UTC)
         val endDate = now
         
         val volatility = when (scenarioType) {
@@ -178,7 +182,7 @@ object BacktestDataGenerator {
             if (weekBars.isNotEmpty()) {
                 val weekDate = weekBars.first().timestamp
                 val weekPrice = weekBars.first().close
-                val expiration = weekDate.plus(kotlinx.datetime.DateTimePeriod(days = 14))
+                val expiration = weekDate.plus(14, DateTimeUnit.DAY, TimeZone.UTC)
                 optionChains[weekDate] = generateHistoricalOptionChain(
                     symbol, weekPrice, expiration
                 )

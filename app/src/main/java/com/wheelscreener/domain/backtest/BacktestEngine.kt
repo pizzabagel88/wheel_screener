@@ -2,11 +2,14 @@ package com.wheelscreener.domain.backtest
 
 import com.wheelscreener.data.remote.CorporateEvent
 import com.wheelscreener.data.remote.EventType
+import com.wheelscreener.data.remote.HistoricalBar
 import com.wheelscreener.domain.model.*
 import com.wheelscreener.domain.scoring.ScoringEngine
 import kotlinx.datetime.Clock
-import kotlinx.datetime.DateTimePeriod
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.plus
 
 /**
  * Backtest engine for validating scoring model performance
@@ -82,12 +85,12 @@ object BacktestEngine {
         val recentBars = barsUpToDate.takeLast(20)
         val latestBar = recentBars.last()
         
-        val sma20 = if (recentBars.size >= 20) recentBars.takeLast(20).map { it.close }.average() else null
-        val sma50 = if (barsUpToDate.size >= 50) barsUpToDate.takeLast(50).map { it.close }.average() else null
-        val sma200 = if (barsUpToDate.size >= 200) barsUpToDate.takeLast(200).map { it.close }.average() else null
+        val sma20 = if (recentBars.size >= 20) recentBars.takeLast(20).map { bar -> bar.close }.average() else null
+        val sma50 = if (barsUpToDate.size >= 50) barsUpToDate.takeLast(50).map { bar -> bar.close }.average() else null
+        val sma200 = if (barsUpToDate.size >= 200) barsUpToDate.takeLast(200).map { bar -> bar.close }.average() else null
         
-        val high20d = recentBars.map { it.high }.maxOrNull()
-        val high60d = if (barsUpToDate.size >= 60) barsUpToDate.takeLast(60).map { it.high }.maxOrNull() else null
+        val high20d = recentBars.map { bar -> bar.high }.maxOrNull()
+        val high60d = if (barsUpToDate.size >= 60) barsUpToDate.takeLast(60).map { bar -> bar.high }.maxOrNull() else null
         
         return Underlying(
             symbol = "TEST",
@@ -95,10 +98,10 @@ object BacktestEngine {
             change = latestBar.close - (recentBars.getOrNull(recentBars.size - 2)?.close ?: latestBar.close),
             changePercent = 0.0, // Simplified
             volume = latestBar.volume,
-            averageVolume20d = recentBars.map { it.volume }.average().toLong(),
+            averageVolume20d = recentBars.map { bar -> bar.volume }.average().toLong(),
             marketCap = 100_000_000_000L, // Simplified
-            fiftyTwoWeekHigh = barsUpToDate.map { it.high }.maxOrNull() ?: latestBar.high,
-            fiftyTwoWeekLow = barsUpToDate.map { it.low }.minOrNull() ?: latestBar.low,
+            fiftyTwoWeekHigh = barsUpToDate.map { bar -> bar.high }.maxOrNull() ?: latestBar.high,
+            fiftyTwoWeekLow = barsUpToDate.map { bar -> bar.low }.minOrNull() ?: latestBar.low,
             lastUpdate = date,
             sma20 = sma20,
             sma50 = sma50,
@@ -143,7 +146,7 @@ object BacktestEngine {
      */
     private fun generateSampleEvents(date: Instant): List<CorporateEvent> {
         // Generate earnings date 3-4 weeks out
-        val earningsDate = date.plus(DateTimePeriod(days = 21 + (0..7).random()))
+        val earningsDate = date.plus(21 + (0..7).random(), DateTimeUnit.DAY, TimeZone.UTC)
         return listOf(
             CorporateEvent("TEST", EventType.EARNINGS, earningsDate, "AMC", "Quarterly Earnings")
         )

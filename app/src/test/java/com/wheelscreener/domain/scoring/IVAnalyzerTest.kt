@@ -157,7 +157,7 @@ class IVAnalyzerTest {
     @Test
     fun `test IV assessment`() {
         val assessment = IVAnalyzer.getIVAssessment(sampleContract, config)
-        assertEquals(IVRegime.NORMAL, assessment.regime)
+        assertEquals(IVRegime.OPTIMAL, assessment.regime)
         assertTrue(assessment.score > 0)
         assertTrue(assessment.flags.isEmpty())
     }

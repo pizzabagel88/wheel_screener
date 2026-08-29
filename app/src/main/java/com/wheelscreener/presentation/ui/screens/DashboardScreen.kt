@@ -1,8 +1,14 @@
 package com.wheelscreener.presentation.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -17,14 +23,18 @@ import com.wheelscreener.presentation.viewmodel.DashboardViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
-    viewModel: DashboardViewModel = hiltViewModel()
+    viewModel: DashboardViewModel = hiltViewModel(),
+    onNavigateToCsp: () -> Unit,
+    onNavigateToCc: () -> Unit,
+    onNavigateToWatchlist: () -> Unit,
+    onNavigateToSettings: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Wheel Screener") },
+                title = { Text("Wheel Screener Dashboard") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -40,147 +50,137 @@ fun DashboardScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Market Status Card
+            // Quick Scan Action Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Market Status",
+                        text = "Real-Time Scoring Scan",
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                     Text(
-                        text = "Provider: ${uiState.providerName}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = "Status: ${if (uiState.isProviderAvailable) "Available" else "Unavailable"}",
+                        text = "Quickly scan your watchlist symbols for optimal Cash-Secured Puts and Covered Calls.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = if (uiState.isProviderAvailable) 
-                            MaterialTheme.colorScheme.primary 
-                        else 
-                            MaterialTheme.colorScheme.error
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
+                    Button(
+                        onClick = { viewModel.runDemoScan() },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            contentColor = MaterialTheme.colorScheme.primaryContainer
+                        ),
+                        enabled = !uiState.isScanning
+                    ) {
+                        Text(if (uiState.isScanning) "Scanning..." else "Run Quick Scan")
+                    }
                 }
             }
+
+            // Quick Navigation Grid
+            Text(
+                text = "Features & Screen Navigation",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
+            )
             
-            // Demo Mode Card
-            Card(
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer
-                )
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "Demo Mode",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "Using MockMarketDataProvider for demonstration",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = "12+ symbols available for testing",
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
-            
-            // Scan Button
-            Button(
-                onClick = { viewModel.runDemoScan() },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = uiState.isProviderAvailable
-            ) {
-                Text("Run Demo Scan")
-            }
-            
-            // Last Scan Results
-            if (uiState.lastScanResults.isNotEmpty()) {
                 Card(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onNavigateToCsp() }
                 ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(Icons.Default.TrendingUp, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("CSP Rankings", fontWeight = FontWeight.Bold)
+                    }
+                }
+                Card(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onNavigateToCc() }
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("CC Rankings", fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Card(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onNavigateToWatchlist() }
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(Icons.Default.List, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Watchlist", fontWeight = FontWeight.Bold)
+                    }
+                }
+                Card(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onNavigateToSettings() }
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(Icons.Default.Settings, contentDescription = null, tint = MaterialTheme.colorScheme.outline)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Settings", fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+
+            // Last scan results panel
+            if (uiState.lastScanResults.isNotEmpty()) {
+                Card(modifier = Modifier.fillMaxWidth()) {
                     Column(
                         modifier = Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = "Last Scan Results",
+                            text = "Recent Scan Top Candidates",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
-                        uiState.lastScanResults.take(5).forEach { result ->
+                        Divider()
+                        uiState.lastScanResults.forEach { result ->
                             Text(
                                 text = result,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
                     }
-                }
-            }
-            
-            // Watchlist Preview
-            Card(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "Default Watchlist",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    uiState.watchlist.forEach { symbol ->
-                        Text(
-                            text = symbol,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                }
-            }
-            
-            // Info Card
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
-                )
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "Phase 1 Complete",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "Clean Architecture/MVVM skeleton with Hilt DI",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = "Room database schema implemented",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = "MockMarketDataProvider with demo mode",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
                 }
             }
         }

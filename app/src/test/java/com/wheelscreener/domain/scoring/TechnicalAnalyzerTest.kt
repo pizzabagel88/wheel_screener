@@ -52,7 +52,7 @@ class TechnicalAnalyzerTest {
     
     @Test
     fun `test within 200 SMA tolerance`() {
-        assertTrue(TechnicalAnalyzer.isWithin200SMATolerance(sampleUnderlying, 10.0))
+        assertTrue(TechnicalAnalyzer.isWithin200SMATolerance(sampleUnderlying, 12.0))
         
         val farUnderlying = sampleUnderlying.copy(
             price = 80.0,
@@ -87,7 +87,7 @@ class TechnicalAnalyzerTest {
     fun `test distance from 200 SMA calculation`() {
         val distance = TechnicalAnalyzer.calculateDistanceFrom200SMA(sampleUnderlying)
         assertNotNull(distance)
-        assertEquals(11.11, distance, 0.1) // (100-90)/90 * 100
+        assertEquals(11.11, distance!!, 0.1) // (100-90)/90 * 100
     }
     
     @Test

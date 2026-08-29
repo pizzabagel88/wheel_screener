@@ -1,6 +1,7 @@
 package com.wheelscreener.data.remote
 
 import com.wheelscreener.domain.model.DataConfidence
+import com.wheelscreener.domain.model.ContractType
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before

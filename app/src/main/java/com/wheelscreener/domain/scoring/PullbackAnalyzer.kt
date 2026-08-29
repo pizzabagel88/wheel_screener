@@ -91,8 +91,8 @@ object PullbackAnalyzer {
         val changePercent = underlying.changePercent
         
         return when {
-            changePercent < marketChangePercent - 2.0 -> PullbackType.SYMBOL_SPECIFIC
-            changePercent > marketChangePercent + 2.0 -> PullbackType.BROAD_MARKET_LED
+            changePercent <= marketChangePercent - 2.0 -> PullbackType.SYMBOL_SPECIFIC
+            changePercent >= marketChangePercent + 2.0 -> PullbackType.BROAD_MARKET_LED
             else -> PullbackType.MIXED
         }
     }

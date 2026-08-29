@@ -43,14 +43,14 @@ class PullbackAnalyzerTest {
     fun `test 20-day pullback calculation`() {
         val pullback = PullbackAnalyzer.calculatePullback20d(sampleUnderlying)
         assertNotNull(pullback)
-        assertEquals(9.09, pullback, 0.1) // (110-100)/110 * 100
+        assertEquals(9.09, pullback!!, 0.1) // (110-100)/110 * 100
     }
     
     @Test
     fun `test 60-day pullback calculation`() {
         val pullback = PullbackAnalyzer.calculatePullback60d(sampleUnderlying)
         assertNotNull(pullback)
-        assertEquals(13.04, pullback, 0.1) // (115-100)/115 * 100
+        assertEquals(13.04, pullback!!, 0.1) // (115-100)/115 * 100
     }
     
     @Test

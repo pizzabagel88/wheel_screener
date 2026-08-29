@@ -4,15 +4,27 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-/**
- * Boot receiver to reschedule alarms after device reboot
- * Phase 1: Placeholder implementation
- */
 @AndroidEntryPoint
 class BootReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
-        // Phase 1: Placeholder - will be implemented in Phase 4
-        // This will reschedule the daily scan alarm after device reboot
+
+    @Inject
+    lateinit var scanScheduler: ScanScheduler
+
+    override fun onReceive(context: Context, intent: Intent?) {
+        if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
+            val pendingResult = goAsync()
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    scanScheduler.reschedule()
+                } finally {
+                    pendingResult.finish()
+                }
+            }
+        }
     }
 }

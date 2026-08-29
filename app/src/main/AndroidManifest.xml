@@ -8,7 +8,6 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 
     <application
         android:name=".WheelScreenerApplication"
@@ -19,6 +18,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WheelScreener"
         tools:targetApi="31">
+
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
         
         <activity
             android:name=".presentation.MainActivity"
@@ -53,6 +63,12 @@
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
             </intent-filter>
         </receiver>
+
+        <!-- Scan receiver for alarm triggers -->
+        <receiver
+            android:name=".data.scheduler.ScanReceiver"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 </manifest>

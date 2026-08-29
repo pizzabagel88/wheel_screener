@@ -1,5 +1,6 @@
 package com.wheelscreener.domain.model
 
+import com.wheelscreener.data.remote.EventType
 import org.junit.Assert.*
 import org.junit.Test
 

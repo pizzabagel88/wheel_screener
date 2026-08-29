@@ -14,8 +14,14 @@ object DteSelector {
      * Calculate DTE from current time to expiration
      */
     fun calculateDTE(currentTime: Instant, expiration: Instant): Int {
-        val diff = expiration - currentTime
-        return diff.inWholeDays.toInt()
+        val zone = java.time.ZoneId.of("America/New_York")
+        val currentDate = java.time.Instant.ofEpochMilli(currentTime.toEpochMilliseconds())
+            .atZone(zone)
+            .toLocalDate()
+        val expirationDate = java.time.Instant.ofEpochMilli(expiration.toEpochMilliseconds())
+            .atZone(zone)
+            .toLocalDate()
+        return java.time.temporal.ChronoUnit.DAYS.between(currentDate, expirationDate).toInt()
     }
     
     /**
@@ -98,6 +104,6 @@ object DteSelector {
         val distanceFromMiddle = kotlin.math.abs(dte - middle)
         
         // Linear scoring: closer to middle = higher score
-        return 1.0 - (distanceFromMiddle / (range / 2.0))
+        return (1.0 - (distanceFromMiddle / (range / 2.0))).coerceAtLeast(0.1)
     }
 }

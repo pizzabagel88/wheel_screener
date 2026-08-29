@@ -19,7 +19,7 @@ object ScoringEngine {
         underlying: Underlying,
         events: List<CorporateEvent>,
         config: StrategyConfig,
-        currentTime: Instant = Clock.System.now
+        currentTime: Instant = Clock.System.now()
     ): CSPScoringResult {
         val dte = DteSelector.calculateDTE(currentTime, contract.expiration)
         val absoluteDelta = DeltaSelector.getAbsoluteDelta(contract.delta)
@@ -128,7 +128,7 @@ object ScoringEngine {
         shareCount: Int,
         costBasis: Double,
         config: StrategyConfig,
-        currentTime: Instant = Clock.System.now
+        currentTime: Instant = Clock.System.now()
     ): CCScoringResult {
         val dte = DteSelector.calculateDTE(currentTime, contract.expiration)
         val absoluteDelta = DeltaSelector.getAbsoluteDelta(contract.delta)

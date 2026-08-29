@@ -19,7 +19,7 @@ import com.wheelscreener.data.local.entity.WatchlistEntity
         SettingsEntity::class
     ],
     version = 1,
-    exportSchema = true
+    exportSchema = false
 )
 abstract class WheelScreenerDatabase : RoomDatabase() {
     
