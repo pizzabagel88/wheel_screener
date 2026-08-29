@@ -210,12 +210,12 @@
 ### Deviations from Spec
 - None - Phase 1 implementation follows specification exactly
 
-### Next Steps (Phase 3)
-1. Implement Compose UI screens (Dashboard, Rankings, Detail, Watchlist, Settings)
-2. Connect scoring engine to ViewModels
-3. Display score components transparently
-4. Implement candidate ranking and filtering
-5. Add strategy configuration UI
+### Current Status
+- ✅ Phase 3 Compose UI and navigation complete
+- ✅ Phase 4 scheduling and notifications complete
+- ✅ Phase 5 opt-in ORATS provider complete
+- ✅ Phase 6 paper position ledger, P&L, CSV export, and reminders complete
+- ✅ Dark Material 3 theme enabled by default
 
 ---
 

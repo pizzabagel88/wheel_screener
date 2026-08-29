@@ -19,7 +19,8 @@ fun NavGraph(navController: NavHostController) {
                 onNavigateToCsp = { navController.navigate(Screen.CspRanking.route) },
                 onNavigateToCc = { navController.navigate(Screen.CcRanking.route) },
                 onNavigateToWatchlist = { navController.navigate(Screen.Watchlist.route) },
-                onNavigateToSettings = { navController.navigate(Screen.Settings.route) }
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                onNavigateToLedger = { navController.navigate(Screen.PositionLedger.route) }
             )
         }
         
@@ -51,6 +52,10 @@ fun NavGraph(navController: NavHostController) {
             SettingsScreen(
                 onBack = { navController.popBackStack() }
             )
+        }
+
+        composable(Screen.PositionLedger.route) {
+            PositionLedgerScreen(onBack = { navController.popBackStack() })
         }
         
         composable(

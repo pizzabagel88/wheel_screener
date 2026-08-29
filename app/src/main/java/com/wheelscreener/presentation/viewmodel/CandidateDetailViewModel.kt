@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.wheelscreener.data.local.dao.SettingsDao
+import com.wheelscreener.data.local.dao.PaperPositionDao
+import com.wheelscreener.data.local.entity.PaperPositionEntity
 import com.wheelscreener.data.local.dao.WatchlistDao
 import com.wheelscreener.domain.model.StrategyConfig
 import com.wheelscreener.domain.repository.MarketDataRepository
@@ -22,7 +24,8 @@ import javax.inject.Inject
 class CandidateDetailViewModel @Inject constructor(
     private val marketDataRepository: MarketDataRepository,
     private val watchlistDao: WatchlistDao,
-    private val settingsDao: SettingsDao
+    private val settingsDao: SettingsDao,
+    private val paperPositionDao: PaperPositionDao
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CandidateDetailUiState())
@@ -101,6 +104,37 @@ class CandidateDetailViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _uiState.value = CandidateDetailUiState(error = "Error loading candidate: ${e.message}")
+            }
+        }
+    }
+
+    fun openPaperPosition() {
+        val csp = _uiState.value.cspCandidate
+        val cc = _uiState.value.ccCandidate
+        val contract = csp?.contract ?: cc?.contract ?: return
+        val underlying = csp?.underlying ?: cc?.underlying ?: return
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isSavingPosition = true, positionSaved = false)
+            runCatching {
+                paperPositionDao.insert(
+                    PaperPositionEntity(
+                        underlyingSymbol = underlying.symbol,
+                        contractSymbol = contract.symbol,
+                        strategy = if (csp != null) "CSP" else "CC",
+                        optionType = contract.contractType.name,
+                        strike = contract.strike,
+                        expiration = contract.expiration.toEpochMilliseconds(),
+                        quantity = 1,
+                        entryCredit = contract.bid,
+                        entryUnderlyingPrice = underlying.price,
+                        entryDelta = contract.delta,
+                        openedAt = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+                    )
+                )
+            }.onSuccess {
+                _uiState.value = _uiState.value.copy(isSavingPosition = false, positionSaved = true)
+            }.onFailure {
+                _uiState.value = _uiState.value.copy(isSavingPosition = false, error = "Unable to open paper position: ${it.message}")
             }
         }
     }

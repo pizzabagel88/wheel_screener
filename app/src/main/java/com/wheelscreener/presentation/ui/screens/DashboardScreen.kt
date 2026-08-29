@@ -27,7 +27,8 @@ fun DashboardScreen(
     onNavigateToCsp: () -> Unit,
     onNavigateToCc: () -> Unit,
     onNavigateToWatchlist: () -> Unit,
-    onNavigateToSettings: () -> Unit
+    onNavigateToSettings: () -> Unit,
+    onNavigateToLedger: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     
@@ -124,6 +125,20 @@ fun DashboardScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text("CC Rankings", fontWeight = FontWeight.Bold)
                     }
+                }
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onNavigateToLedger() }
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("Paper Position Ledger", fontWeight = FontWeight.Bold)
+                    Text("Track P&L, export positions, and review roll reminders")
                 }
             }
 

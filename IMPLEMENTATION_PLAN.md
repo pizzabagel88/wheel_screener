@@ -175,7 +175,7 @@ Based on research for free-only tools, here are the best options data providers 
 
 ## Implementation Approach
 
-### Phase 1: Foundation (Current)
+### Phase 1: Foundation (Complete)
 - Clean Architecture/MVVM skeleton
 - Hilt DI setup
 - Room database schema
@@ -183,32 +183,32 @@ Based on research for free-only tools, here are the best options data providers 
 - Demo mode with 12+ symbols
 - Basic UI skeleton
 
-### Phase 2: Scoring Engine
+### Phase 2: Scoring Engine (Complete)
 - Pure function scoring components
 - Comprehensive unit tests
 - Backtest module with synthetic data
 - Score correlation analysis (pullback vs trend)
 
-### Phase 3: Compose UI
+### Phase 3: Compose UI (Complete)
 - Dashboard screen
 - CSP/CC ranking screens
 - Candidate detail screen
 - Watchlist management
 - Settings screen
 
-### Phase 4: Scheduling
+### Phase 4: Scheduling (Complete)
 - AlarmManager exact alarms
 - WorkManager fallback
 - Market calendar integration
 - Notification system
 
-### Phase 5: Real Data Provider
+### Phase 5: Real Data Provider (Complete)
 - ORATS API integration
 - API key management
 - Error handling and rate limiting
 - Data validation
 
-### Phase 6: Paper Trading
+### Phase 6: Paper Trading (Complete)
 - Position ledger
 - CSV export
 - P&L tracking
@@ -261,6 +261,6 @@ Based on research for free-only tools, here are the best options data providers 
 
 ---
 
-## Next Steps
+## Current Status
 
-Proceeding with Phase 1 implementation using ORATS as the target data provider, with MockMarketDataProvider for development and testing.
+All six planned phases are implemented. The app remains usable in mock/demo mode by default; add an ORATS key in ignored `local.properties` to enable the real-data provider.

@@ -18,8 +18,10 @@ class NotificationHelper @Inject constructor(
     companion object {
         const val CHANNEL_ID_SCAN = "scan_channel"
         const val CHANNEL_ID_CANDIDATES = "candidates_channel"
+        const val CHANNEL_ID_POSITIONS = "positions_channel"
         const val NOTIFICATION_ID_SCAN_COMPLETE = 1001
         const val NOTIFICATION_ID_CANDIDATES = 1002
+        const val NOTIFICATION_ID_POSITIONS = 1003
     }
     
     init {
@@ -46,6 +48,13 @@ class NotificationHelper @Inject constructor(
             
             notificationManager.createNotificationChannel(scanChannel)
             notificationManager.createNotificationChannel(candidatesChannel)
+            notificationManager.createNotificationChannel(
+                NotificationChannel(
+                    CHANNEL_ID_POSITIONS,
+                    "Paper Position Reminders",
+                    NotificationManager.IMPORTANCE_DEFAULT
+                ).apply { description = "Roll and assignment reminders for paper positions" }
+            )
         }
     }
     
@@ -82,5 +91,18 @@ class NotificationHelper @Inject constructor(
             .build()
         
         notificationManager.notify(NOTIFICATION_ID_CANDIDATES, notification)
+    }
+
+    fun showPositionReminders(reminders: List<String>) {
+        if (reminders.isEmpty()) return
+        val content = reminders.take(4).joinToString("\n")
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID_POSITIONS)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle("Paper position reminders")
+            .setContentText(reminders.first())
+            .setStyle(NotificationCompat.BigTextStyle().bigText(content))
+            .setAutoCancel(true)
+            .build()
+        notificationManager.notify(NOTIFICATION_ID_POSITIONS, notification)
     }
 }

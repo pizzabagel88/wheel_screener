@@ -121,6 +121,20 @@ fun CandidateDetailScreen(
                     }
                 }
 
+                Button(
+                    onClick = viewModel::openPaperPosition,
+                    enabled = !uiState.isSavingPosition && !uiState.positionSaved,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        when {
+                            uiState.positionSaved -> "Paper position opened"
+                            uiState.isSavingPosition -> "Opening paper position..."
+                            else -> "Open paper position"
+                        }
+                    )
+                }
+
                 // Warnings / Flags
                 if (flags.isNotEmpty()) {
                     Text("Flags", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)

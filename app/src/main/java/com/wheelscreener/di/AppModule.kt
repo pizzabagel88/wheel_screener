@@ -2,8 +2,11 @@ package com.wheelscreener.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.wheelscreener.data.local.WheelScreenerDatabase
 import com.wheelscreener.data.local.dao.ScanResultDao
+import com.wheelscreener.data.local.dao.PaperPositionDao
 import com.wheelscreener.data.local.dao.SettingsDao
 import com.wheelscreener.data.local.dao.WatchlistDao
 import com.wheelscreener.data.remote.MarketDataProvider
@@ -35,7 +38,7 @@ object AppModule {
             WheelScreenerDatabase::class.java,
             "wheel_screener_database"
         )
-            .fallbackToDestructiveMigration()
+            .addMigrations(MIGRATION_1_2)
             .build()
     }
     
@@ -48,6 +51,9 @@ object AppModule {
     fun provideScanResultDao(database: WheelScreenerDatabase): ScanResultDao {
         return database.scanResultDao()
     }
+
+    @Provides
+    fun providePaperPositionDao(database: WheelScreenerDatabase): PaperPositionDao = database.paperPositionDao()
     
     @Provides
     fun provideSettingsDao(database: WheelScreenerDatabase): SettingsDao {
@@ -79,5 +85,31 @@ object AppModule {
     @Singleton
     fun provideMoshi(): Moshi {
         return Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+    }
+
+    private val MIGRATION_1_2 = object : Migration(1, 2) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("""
+                CREATE TABLE IF NOT EXISTS paper_positions (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    underlyingSymbol TEXT NOT NULL,
+                    contractSymbol TEXT NOT NULL,
+                    strategy TEXT NOT NULL,
+                    optionType TEXT NOT NULL,
+                    strike REAL NOT NULL,
+                    expiration INTEGER NOT NULL,
+                    quantity INTEGER NOT NULL,
+                    entryCredit REAL NOT NULL,
+                    entryUnderlyingPrice REAL NOT NULL,
+                    entryDelta REAL,
+                    openedAt INTEGER NOT NULL,
+                    status TEXT NOT NULL,
+                    closeDebit REAL,
+                    closedAt INTEGER,
+                    assignmentPrice REAL,
+                    notes TEXT NOT NULL
+                )
+            """.trimIndent())
+        }
     }
 }

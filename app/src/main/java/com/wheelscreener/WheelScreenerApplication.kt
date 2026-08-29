@@ -5,6 +5,7 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
+import com.wheelscreener.data.scheduler.PositionReminderScheduler
 
 /**
  * Main application class with Hilt setup
@@ -13,6 +14,14 @@ import javax.inject.Inject
 class WheelScreenerApplication : Application(), Configuration.Provider {
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
+
+    @Inject
+    lateinit var positionReminderScheduler: PositionReminderScheduler
+
+    override fun onCreate() {
+        super.onCreate()
+        positionReminderScheduler.schedule()
+    }
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()

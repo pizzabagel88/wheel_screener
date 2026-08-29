@@ -8,5 +8,7 @@ data class CandidateDetailUiState(
     val cspCandidate: CSPScoringResult? = null,
     val ccCandidate: CCScoringResult? = null,
     val error: String? = null,
-    val isSavedInWatchlist: Boolean = false
+    val isSavedInWatchlist: Boolean = false,
+    val isSavingPosition: Boolean = false,
+    val positionSaved: Boolean = false
 )

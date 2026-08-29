@@ -32,3 +32,10 @@ val OnPrimary = Color(0xFFFFFFFF)
 val OnSecondary = Color(0xFFFFFFFF)
 val OnBackground = Color(0xFF212121)
 val OnSurface = Color(0xFF212121)
+
+// Dark theme colors
+val DarkBackground = Color(0xFF101418)
+val DarkSurface = Color(0xFF181D23)
+val DarkSurfaceVariant = Color(0xFF242B33)
+val DarkOnBackground = Color(0xFFE2E8F0)
+val DarkOnSurface = Color(0xFFE2E8F0)

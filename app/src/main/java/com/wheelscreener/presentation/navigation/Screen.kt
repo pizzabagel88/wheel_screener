@@ -6,6 +6,7 @@ sealed class Screen(val route: String) {
     object CcRanking : Screen("cc_ranking")
     object Watchlist : Screen("watchlist")
     object Settings : Screen("settings")
+    object PositionLedger : Screen("position_ledger")
     object CandidateDetail : Screen("candidate_detail/{symbol}/{strike}/{expiration}/{type}") {
         fun createRoute(symbol: String, strike: Double, expirationEpoch: Long, type: String): String {
             return "candidate_detail/$symbol/$strike/$expirationEpoch/$type"
