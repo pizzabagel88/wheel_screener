@@ -1,3 +1,16 @@
+import java.util.Properties
+
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use(::load)
+    }
+}
+val oratsApiKey = providers.gradleProperty("ORATS_API_KEY").orNull
+    ?: localProperties.getProperty("ORATS_API_KEY", "")
+val oratsBaseUrl = providers.gradleProperty("ORATS_BASE_URL").orNull
+    ?: localProperties.getProperty("ORATS_BASE_URL", "https://api.orats.io/")
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -21,6 +34,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildConfigField("String", "ORATS_API_KEY", "\"${oratsApiKey.replace("\\", "\\\\").replace("\"", "\\\"")}\"")
+        buildConfigField("String", "ORATS_BASE_URL", "\"${oratsBaseUrl.replace("\\", "\\\\").replace("\"", "\\\"")}\"")
     }
 
     buildTypes {
@@ -44,6 +59,7 @@ android {
     
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     
     composeOptions {

@@ -230,13 +230,19 @@
 1. Clone the repository
 2. Open in Android Studio
 3. Gradle will sync automatically
-4. Add API keys to `local.properties` when ready for Phase 5
+4. The app starts in safe demo mode until an ORATS key is configured.
 
 ### API Key Configuration (Phase 5)
 ```properties
 # local.properties
 ORATS_API_KEY=your_api_key_here
+# Optional: use only an HTTPS ORATS-compatible endpoint.
+# ORATS_BASE_URL=https://api.orats.io/
 ```
+
+`local.properties` is ignored by Git. Do not put production keys in source control.
+With a non-empty `ORATS_API_KEY`, the app uses `OratsMarketDataProvider`; otherwise it
+continues to use `MockMarketDataProvider`.
 
 ### Running Tests
 ```bash

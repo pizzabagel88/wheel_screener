@@ -7,11 +7,13 @@ import com.wheelscreener.data.local.dao.ScanResultDao
 import com.wheelscreener.data.local.dao.SettingsDao
 import com.wheelscreener.data.local.dao.WatchlistDao
 import com.wheelscreener.data.remote.MarketDataProvider
+import com.wheelscreener.data.remote.OratsMarketDataProvider
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.wheelscreener.data.remote.MockMarketDataProvider
 import com.wheelscreener.data.repository.MarketDataRepositoryImpl
 import com.wheelscreener.domain.repository.MarketDataRepository
+import com.wheelscreener.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -54,8 +56,15 @@ object AppModule {
     
     @Provides
     @Singleton
-    fun provideMockMarketDataProvider(): MarketDataProvider {
-        return MockMarketDataProvider()
+    fun provideMarketDataProvider(): MarketDataProvider {
+        return if (BuildConfig.ORATS_API_KEY.isBlank()) {
+            MockMarketDataProvider()
+        } else {
+            OratsMarketDataProvider(
+                apiKey = BuildConfig.ORATS_API_KEY,
+                baseUrl = BuildConfig.ORATS_BASE_URL
+            )
+        }
     }
     
     @Provides
